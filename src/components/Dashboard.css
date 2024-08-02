@@ -1,0 +1,23 @@
+.site-layout .site-layout-background {
+    background: #fff;
+  }
+  .site-layout .site-layout-background {
+    background: #fff;
+  }
+  
+  .number {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .number span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .number h3 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  
