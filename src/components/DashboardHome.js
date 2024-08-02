@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, message, Statistic, Badge } from 'antd';
 import { UserOutlined, DollarOutlined, GoldOutlined, FileProtectOutlined } from '@ant-design/icons';
-import { collection, onSnapshot, query, where, Timestamp, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { firestore } from '../utils/firebase';
 import moment from 'moment';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -35,33 +35,8 @@ const DashboardHome = () => {
     const unsubscribeDeposits = onSnapshot(collection(firestore, 'deposits'), (snapshot) => {
       const total = snapshot.docs.reduce((acc, doc) => acc + doc.data().amount, 0);
       setTotalDeposits(total);
-    });
 
-    fetchDepositData();
-
-    return () => {
-      window.removeEventListener('online', handleNetworkChange);
-      window.removeEventListener('offline', handleNetworkChange);
-      unsubscribeUsers();
-      unsubscribeRequests();
-      unsubscribeDeposits();
-    };
-  }, []);
-
-  const fetchDepositData = async () => {
-    try {
-      const now = new Date();
-      const startDate = moment(now).subtract(7, 'days').toDate();
-
-      const depositsQuery = query(
-        collection(firestore, 'deposits'),
-        where('time', '>=', startDate.toISOString()),
-        where('time', '<=', now.toISOString())
-      );
-
-      const depositsSnapshot = await getDocs(depositsQuery);
-
-      const data = depositsSnapshot.docs.map((doc) => {
+      const data = snapshot.docs.map((doc) => {
         const time = new Date(doc.data().time);
         const amount = doc.data().amount;
         return { date: moment(time).format('YYYY-MM-DD'), amount };
@@ -79,11 +54,16 @@ const DashboardHome = () => {
       }, []);
 
       setDepositData(aggregatedData);
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to fetch deposit data');
-    }
-  };
+    });
+
+    return () => {
+      window.removeEventListener('online', handleNetworkChange);
+      window.removeEventListener('offline', handleNetworkChange);
+      unsubscribeUsers();
+      unsubscribeRequests();
+      unsubscribeDeposits();
+    };
+  }, []);
 
   const iconStyles = {
     fontSize: '32px',
